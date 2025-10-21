@@ -5,593 +5,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Endless Tower Climb</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: #1a1a2e;
-            color: #eee;
-            overflow-x: hidden;
-        }
-
-        #gameContainer {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        #gameTitle {
-            text-align: center;
-            font-size: 2.5em;
-            color: #ffd700;
-            text-shadow: 2px 2px 4px #000;
-            margin-bottom: 20px;
-            letter-spacing: 3px;
-        }
-
-        .game-area {
-            display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .panel {
-            background: #16213e;
-            border: 3px solid #0f3460;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .panel h2 {
-            color: #ffd700;
-            border-bottom: 2px solid #0f3460;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        #characterPanel {
-            min-height: 400px;
-        }
-
-        #mainDisplay {
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #inventoryPanel {
-            min-height: 400px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #0f3460;
-        }
-
-        .stat-label {
-            color: #aaa;
-        }
-
-        .stat-value {
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #0f3460;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 5px 0;
-            border: 1px solid #000;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8em;
-            color: #fff;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .hp-fill {
-            background: linear-gradient(90deg, #ff416c, #ff4b2b);
-        }
-
-        .xp-fill {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
-        }
-
-        #floorDisplay {
-            background: #0f3460;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        #floorNumber {
-            font-size: 2em;
-            color: #ffd700;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        #battleArea {
-            flex-grow: 1;
-            background: #0f3460;
-            border-radius: 8px;
-            padding: 20px;
-            position: relative;
-            min-height: 300px;
-        }
-
-        .character-sprite, .enemy-sprite {
-            width: 80px;
-            height: 80px;
-            position: absolute;
-            image-rendering: pixelated;
-            transition: transform 0.2s;
-        }
-
-        .character-sprite {
-            bottom: 30px;
-            left: 50px;
-        }
-
-        .enemy-sprite {
-            bottom: 30px;
-            right: 50px;
-        }
-
-        .pixel-sprite {
-            display: inline-block;
-            font-size: 4em;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        .damage-number {
-            position: absolute;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ff4b2b;
-            text-shadow: 2px 2px 4px #000;
-            animation: floatUp 1s ease-out forwards;
-            pointer-events: none;
-        }
-
-        @keyframes floatUp {
-            to {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-        }
-
-        .heal-number {
-            color: #00ff00;
-        }
-
-        .crit-number {
-            color: #ffd700;
-            font-size: 2em;
-        }
-
-        #actionButtons {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-shadow: 1px 1px 2px #000;
-            font-family: 'Courier New', monospace;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-attack {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-        }
-
-        .btn-defend {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .btn-ability {
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-        }
-
-        .btn-proceed {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .item-slot {
-            background: #0f3460;
-            border: 2px solid #1a1a2e;
-            border-radius: 5px;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .item-slot:hover {
-            border-color: #ffd700;
-            transform: scale(1.05);
-        }
-
-        .item-slot.equipped {
-            border-color: #00ff00;
-            background: #1a3a1a;
-        }
-
-        .item-name {
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 5px;
-        }
-
-        .item-stats {
-            font-size: 0.85em;
-            color: #aaa;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: #1a1a2e; color: #eee; }
+        #gameContainer { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        #gameTitle { text-align: center; font-size: 2.5em; color: #ffd700; margin-bottom: 20px; }
+        .game-area { display: grid; grid-template-columns: 280px 1fr 320px; gap: 20px; }
+        .panel { background: #16213e; border: 3px solid #0f3460; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .panel h2 { color: #ffd700; border-bottom: 2px solid #0f3460; padding-bottom: 8px; margin-bottom: 15px; }
+        .stat-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #0f3460; }
+        .progress-bar { width: 100%; height: 20px; background: #0f3460; border-radius: 10px; margin: 5px 0; overflow: hidden; }
+        .progress-fill { height: 100%; transition: width 0.3s; text-align: center; color: #fff; line-height: 20px; font-size: 0.8em; }
+        .hp-fill { background: #ff4b2b; }
+        .xp-fill { background: #ffd700; }
+        #battleArea { background: #0f3460; border-radius: 8px; padding: 20px; position: relative; min-height: 300px; }
+        .character-sprite, .enemy-sprite { position: absolute; font-size: 4em; }
+        .character-sprite { bottom: 30px; left: 50px; }
+        .enemy-sprite { bottom: 30px; right: 50px; }
+        .btn { padding: 12px 20px; background: #667eea; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin: 5px; transition: all 0.3s; }
+        .btn:hover { background: #764ba2; transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #classSelection { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
+        .class-card { background: #16213e; border: 3px solid #0f3460; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.3s; }
+        .class-card:hover { border-color: #ffd700; transform: translateY(-5px); }
+        .class-icon { font-size: 3em; margin-bottom: 10px; }
+        .item-slot { background: #0f3460; border: 2px solid #1a1a2e; border-radius: 5px; padding: 10px; margin: 5px 0; cursor: pointer; }
+        .item-slot:hover { border-color: #ffd700; }
+        #eventLog { background: #0f3460; border-radius: 8px; padding: 15px; height: 150px; overflow-y: auto; margin-top: 10px; font-size: 0.9em; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #16213e; border: 3px solid #ffd700; border-radius: 8px; padding: 30px; max-width: 600px; max-height: 80vh; overflow-y: auto; }
         .rarity-common { color: #fff; }
         .rarity-uncommon { color: #00ff00; }
         .rarity-rare { color: #4169e1; }
         .rarity-epic { color: #9370db; }
         .rarity-legendary { color: #ffd700; }
-
-        #eventLog {
-            background: #0f3460;
-            border-radius: 8px;
-            padding: 15px;
-            height: 150px;
-            overflow-y: auto;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .log-entry {
-            padding: 5px 0;
-            border-bottom: 1px solid #1a1a2e;
-        }
-
-        .log-combat { color: #ff6b6b; }
-        .log-level { color: #ffd700; }
-        .log-item { color: #4ecdc4; }
-        .log-event { color: #95e1d3; }
-
-        #classSelection {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-
-        .class-card {
-            background: #16213e;
-            border: 3px solid #0f3460;
-            border-radius: 8px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .class-card:hover {
-            border-color: #ffd700;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        }
-
-        .class-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .class-name {
-            font-size: 1.3em;
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-
-        .class-description {
-            font-size: 0.9em;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        .class-rarity {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        #achievementNotification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: 3px solid #ffd700;
-            border-radius: 8px;
-            padding: 20px;
-            min-width: 300px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            transform: translateX(400px);
-            transition: transform 0.5s ease-out;
-            z-index: 1000;
-        }
-
-        #achievementNotification.show {
-            transform: translateX(0);
-        }
-
-        .ability-list {
-            margin-top: 15px;
-        }
-
-        .ability-item {
-            background: #0f3460;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            border-left: 3px solid #ffd700;
-        }
-
-        .ability-name {
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .ability-cooldown {
-            color: #ff6b6b;
-            font-size: 0.85em;
-        }
-
-        .status-effects {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .status-effect {
-            background: #0f3460;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            border: 1px solid #ffd700;
-        }
-
-        #prestigePanel {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: 3px solid #ffd700;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: #16213e;
-            border: 3px solid #ffd700;
-            border-radius: 8px;
-            padding: 30px;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .shop-item {
-            background: #0f3460;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        @media (max-width: 1200px) {
-            .game-area {
-                grid-template-columns: 1fr;
-            }
-        }
+        .talent-tree { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .talent-node { background: #0f3460; border: 2px solid #1a1a2e; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .talent-node:hover { border-color: #ffd700; }
+        .talent-node.unlocked { border-color: #00ff00; background: #1a3a1a; }
+        .talent-node.locked { opacity: 0.5; cursor: not-allowed; }
+        .pet-card { background: #0f3460; border: 2px solid #1a1a2e; border-radius: 8px; padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .pet-card.active { border-color: #00ff00; background: #1a3a1a; }
+        .pet-sprite { position: absolute; bottom: 30px; left: 150px; font-size: 2em; }
     </style>
 </head>
 <body>
     <div id="gameContainer">
         <h1 id="gameTitle">⚔️ ENDLESS TOWER CLIMB ⚔️</h1>
         
-        <!-- Class Selection Screen (shown at start) -->
-        <div id="classSelectionScreen" class="panel" style="display: block;">
+        <div id="classSelectionScreen" class="panel">
             <h2>Choose Your Class</h2>
             <div id="classSelection"></div>
         </div>
 
-        <!-- Main Game Area (hidden at start) -->
         <div id="gameArea" class="game-area" style="display: none;">
-            <!-- Left Panel: Character Info -->
-            <div class="panel" id="characterPanel">
-                <h2>Character</h2>
-                <div class="stat-row">
-                    <span class="stat-label">Class:</span>
-                    <span class="stat-value" id="className"></span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Level:</span>
-                    <span class="stat-value" id="charLevel">1</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">HP:</span>
-                    <span class="stat-value" id="charHP">100/100</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill hp-fill" id="hpBar" style="width: 100%;">100%</div>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">XP:</span>
-                    <span class="stat-value" id="charXP">0/100</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill xp-fill" id="xpBar" style="width: 0%;">0%</div>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Attack:</span>
-                    <span class="stat-value" id="charAttack">10</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Defense:</span>
-                    <span class="stat-value" id="charDefense">5</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Crit Chance:</span>
-                    <span class="stat-value" id="charCrit">5%</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Gold:</span>
-                    <span class="stat-value" id="charGold">💰 0</span>
-                </div>
-                
-                <div class="ability-list">
-                    <h3 style="color: #ffd700; margin-bottom: 10px;">Abilities</h3>
-                    <div id="abilityList"></div>
+            <div>
+                <div class="panel">
+                    <h2>Character</h2>
+                    <div class="stat-row"><span>Class:</span><span id="className"></span></div>
+                    <div class="stat-row"><span>Level:</span><span id="charLevel">1</span></div>
+                    <div class="stat-row"><span>Talent Points:</span><span id="talentPoints" style="color: #ffd700;">0</span></div>
+                    <div class="stat-row"><span>HP:</span><span id="charHP">100/100</span></div>
+                    <div class="progress-bar"><div class="progress-fill hp-fill" id="hpBar" style="width: 100%;">100%</div></div>
+                    <div class="stat-row"><span>XP:</span><span id="charXP">0/100</span></div>
+                    <div class="progress-bar"><div class="progress-fill xp-fill" id="xpBar" style="width: 0%;">0%</div></div>
+                    <div class="stat-row"><span>Attack:</span><span id="charAttack">10</span></div>
+                    <div class="stat-row"><span>Defense:</span><span id="charDefense">5</span></div>
+                    <div class="stat-row"><span>Gold:</span><span id="charGold">💰 0</span></div>
+                    <div class="stat-row"><span>Materials:</span><span id="charMaterials">🔮 0</span></div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="game.openTalents()" style="width: 100%;">🌟 Talents</button>
+                        <button class="btn" onclick="game.openPets()" style="width: 100%;">🐾 Pets</button>
+                        <button class="btn" onclick="game.openCheats()" style="width: 100%; background: #ff0066;">🔧 Debug</button>
+                        <button class="btn" onclick="game.saveGame()" style="width: 100%;">💾 Save</button>
+                        <button class="btn" onclick="game.loadGame()" style="width: 100%;">📂 Load</button>
+                    </div>
                 </div>
 
-                <div class="status-effects" id="statusEffects"></div>
-
-                <div style="margin-top: 15px;">
-                    <button class="btn" onclick="game.saveGame()">💾 Save</button>
-                    <button class="btn" onclick="game.loadGame()">📂 Load</button>
+                <div class="panel">
+                    <h2>Active Pet</h2>
+                    <div id="activePet" style="text-align: center; padding: 20px; color: #aaa;">No pet active</div>
                 </div>
             </div>
 
-            <!-- Center Panel: Main Display -->
-            <div class="panel" id="mainDisplay">
-                <div id="floorDisplay">
-                    <div>FLOOR</div>
-                    <div id="floorNumber">1</div>
-                    <div id="anomalyDisplay" style="color: #ff6b6b; margin-top: 5px;"></div>
-                </div>
-
-                <div id="battleArea">
-                    <div class="character-sprite">
-                        <div class="pixel-sprite" id="playerSprite">🗡️</div>
+            <div>
+                <div class="panel" style="display: flex; flex-direction: column;">
+                    <div style="background: #0f3460; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+                        <div>FLOOR</div>
+                        <div id="floorNumber" style="font-size: 2em; color: #ffd700;">1</div>
                     </div>
-                    <div class="enemy-sprite" id="enemyContainer">
-                        <div class="pixel-sprite" id="enemySprite">👹</div>
-                        <div style="text-align: center; margin-top: 5px;">
-                            <div id="enemyName" style="color: #ffd700;">Enemy</div>
-                            <div id="enemyHP" style="color: #ff6b6b;">HP: 100/100</div>
+                    <div id="battleArea">
+                        <div class="character-sprite" id="playerSprite">🗡️</div>
+                        <div class="pet-sprite" id="petSprite"></div>
+                        <div class="enemy-sprite">
+                            <div id="enemySprite">👹</div>
+                            <div style="text-align: center; font-size: 0.3em; margin-top: 10px;">
+                                <div id="enemyName">Enemy</div>
+                                <div id="enemyHP">HP: 100/100</div>
+                            </div>
                         </div>
                     </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px;">
+                        <button class="btn" onclick="game.playerAttack()" style="background: #ff4b2b;">⚔️ Attack</button>
+                        <button class="btn" onclick="game.playerDefend()" style="background: #00f2fe;">🛡️ Defend</button>
+                        <button class="btn" onclick="game.useAbility()" style="background: #ffd700;">✨ Ability</button>
+                        <button class="btn" onclick="game.nextFloor()" id="proceedBtn" style="display: none; grid-column: 1/-1; background: #38ef7d;">⬆️ Next Floor</button>
+                        <button class="btn" onclick="game.openShop()">🏪 Shop</button>
+                    </div>
+                    <div id="eventLog"></div>
                 </div>
-
-                <div id="actionButtons">
-                    <button class="btn btn-attack" onclick="game.playerAttack()">⚔️ Attack</button>
-                    <button class="btn btn-defend" onclick="game.playerDefend()">🛡️ Defend</button>
-                    <button class="btn btn-ability" onclick="game.useAbility()">✨ Ability</button>
-                    <button class="btn btn-proceed" onclick="game.nextFloor()" id="proceedBtn" style="display: none;">⬆️ Next Floor</button>
-                    <button class="btn" onclick="game.openShop()">🏪 Shop</button>
-                    <button class="btn" onclick="game.showAchievements()">🏆 Achievements</button>
-                </div>
-
-                <div id="eventLog"></div>
             </div>
 
-            <!-- Right Panel: Inventory -->
-            <div class="panel" id="inventoryPanel">
-                <h2>Inventory</h2>
-                <div class="stat-row">
-                    <span class="stat-label">Equipped Weapon:</span>
+            <div>
+                <div class="panel">
+                    <h2>Inventory</h2>
+                    <div id="inventoryGrid"></div>
                 </div>
-                <div id="equippedWeapon" style="margin: 10px 0; padding: 10px; background: #0f3460; border-radius: 5px;">
-                    <div style="color: #aaa;">None</div>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Equipped Armor:</span>
-                </div>
-                <div id="equippedArmor" style="margin: 10px 0; padding: 10px; background: #0f3460; border-radius: 5px;">
-                    <div style="color: #aaa;">None</div>
-                </div>
-                <h3 style="color: #ffd700; margin: 15px 0 10px 0;">Items</h3>
-                <div class="inventory-grid" id="inventoryGrid"></div>
             </div>
-        </div>
-
-        <!-- Prestige Panel -->
-        <div id="prestigePanel" style="display: none;">
-            <h2>🌟 PRESTIGE AVAILABLE 🌟</h2>
-            <p>You've reached floor 50! Prestige to restart with permanent bonuses.</p>
-            <button class="btn" onclick="game.prestige()">Prestige Now</button>
         </div>
     </div>
 
-    <!-- Achievement Notification -->
-    <div id="achievementNotification">
-        <div style="font-size: 1.5em; margin-bottom: 10px;">🏆 Achievement Unlocked!</div>
-        <div id="achievementText"></div>
-    </div>
-
-    <!-- Modals -->
     <div id="shopModal" class="modal">
         <div class="modal-content">
             <h2>🏪 Shop</h2>
@@ -600,1343 +133,763 @@
         </div>
     </div>
 
-    <div id="achievementModal" class="modal">
+    <div id="talentModal" class="modal">
         <div class="modal-content">
-            <h2>🏆 Achievements</h2>
-            <div id="achievementList"></div>
-            <button class="btn" onclick="game.closeAchievements()">Close</button>
+            <h2>🌟 Talent Tree</h2>
+            <p>Available Points: <span id="availablePoints" style="color: #ffd700; font-weight: bold;">0</span></p>
+            <div class="talent-tree" id="talentTree"></div>
+            <button class="btn" onclick="game.closeTalents()">Close</button>
+        </div>
+    </div>
+
+    <div id="petModal" class="modal">
+        <div class="modal-content">
+            <h2>🐾 Companions</h2>
+            <div id="petList"></div>
+            <button class="btn" onclick="game.closePets()">Close</button>
+        </div>
+    </div>
+
+    <div id="cheatModal" class="modal">
+        <div class="modal-content">
+            <h2>🔧 Debug Menu</h2>
+            <div id="cheatContent">
+                <div style="margin-bottom: 20px;">
+                    <label>Password:</label><br>
+                    <input type="password" id="cheatPassword" style="width: 100%; padding: 10px; margin-top: 5px; background: #0f3460; border: 2px solid #1a1a2e; color: #fff; border-radius: 5px;">
+                    <button class="btn" onclick="game.unlockCheats()" style="width: 100%; margin-top: 10px;">Unlock</button>
+                </div>
+                <div id="cheatButtons" style="display: none;">
+                    <h3 style="color: #ffd700; margin-bottom: 15px;">Developer Tools</h3>
+                    <button class="btn" onclick="game.cheat('gold')" style="width: 100%; margin: 5px 0;">💰 +10000 Gold</button>
+                    <button class="btn" onclick="game.cheat('xp')" style="width: 100%; margin: 5px 0;">⭐ +5000 XP</button>
+                    <button class="btn" onclick="game.cheat('level')" style="width: 100%; margin: 5px 0;">📈 +10 Levels</button>
+                    <button class="btn" onclick="game.cheat('talents')" style="width: 100%; margin: 5px 0;">🌟 +10 Talent Points</button>
+                    <button class="btn" onclick="game.cheat('floor')" style="width: 100%; margin: 5px 0;">⬆️ +10 Floors</button>
+                    <button class="btn" onclick="game.cheat('godmode')" style="width: 100%; margin: 5px 0;">🛡️ Toggle God Mode</button>
+                    <button class="btn" onclick="game.cheat('killEnemy')" style="width: 100%; margin: 5px 0; background: #ff4b2b;">💀 Instant Kill Enemy</button>
+                    <button class="btn" onclick="game.cheat('allPets')" style="width: 100%; margin: 5px 0;">🐾 Unlock All Pets</button>
+                    <button class="btn" onclick="game.cheat('legendary')" style="width: 100%; margin: 5px 0;">✨ Get Legendary Item</button>
+                    <button class="btn" onclick="game.cheat('maxStats')" style="width: 100%; margin: 5px 0; background: #ffd700;">⚡ Max Stats</button>
+                </div>
+            </div>
+            <button class="btn" onclick="game.closeCheats()">Close</button>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // GAME CONFIGURATION & DATA STRUCTURES
-        // ============================================
-        
-        const GAME_CONFIG = {
-            BASE_HP: 100,
-            BASE_ATTACK: 10,
-            BASE_DEFENSE: 5,
-            BASE_CRIT_CHANCE: 5,
-            CRIT_MULTIPLIER: 2,
-            LEVEL_UP_HP_BONUS: 20,
-            LEVEL_UP_STAT_BONUS: 2,
-            PRESTIGE_FLOOR_REQUIREMENT: 50,
-            ENEMY_SCALING: 1.15, // Enemies get 15% stronger per floor
-            GOLD_PER_FLOOR: 10,
-            SAVE_KEY: 'towerClimbSave'
+        var CLASSES = {
+            warrior: { name: 'Warrior', icon: '⚔️', desc: 'Balanced fighter', bonuses: { hp: 20, attack: 5, defense: 3 } },
+            mage: { name: 'Mage', icon: '🔮', desc: 'Glass cannon', bonuses: { hp: -10, attack: 8, defense: 0 } },
+            rogue: { name: 'Rogue', icon: '🗡️', desc: 'High crit', bonuses: { hp: 0, attack: 3, defense: 2 } },
+            paladin: { name: 'Paladin', icon: '🛡️', desc: 'Holy healer', bonuses: { hp: 30, attack: 4, defense: 6 } },
+            necromancer: { name: 'Necromancer', icon: '💀', desc: 'Lifesteal', bonuses: { hp: 10, attack: 6, defense: 3 } },
+            dragonborn: { name: 'Dragonborn', icon: '🐉', desc: 'Legendary', bonuses: { hp: 50, attack: 10, defense: 8 } }
         };
 
-        // Class definitions with rarity and bonuses
-        const CLASSES = {
-            warrior: {
-                name: 'Warrior',
-                icon: '⚔️',
-                rarity: 'common',
-                description: 'Balanced fighter with strong attacks',
-                xpModifier: 1.0, // Normal XP requirement
-                bonuses: { hp: 20, attack: 5, defense: 3 },
-                abilities: [
-                    { name: 'Power Strike', cooldown: 3, effect: 'deal_damage', power: 2 }
-                ]
-            },
-            mage: {
-                name: 'Mage',
-                icon: '🔮',
-                rarity: 'common',
-                description: 'Glass cannon with devastating magic',
-                xpModifier: 1.0,
-                bonuses: { hp: -10, attack: 8, defense: 0 },
-                abilities: [
-                    { name: 'Fireball', cooldown: 4, effect: 'deal_damage', power: 2.5 }
-                ]
-            },
-            rogue: {
-                name: 'Rogue',
-                icon: '🗡️',
-                rarity: 'uncommon',
-                description: 'Quick attacks with high critical chance',
-                xpModifier: 1.3, // Requires 30% more XP
-                bonuses: { hp: 0, attack: 3, defense: 2, critChance: 10 },
-                abilities: [
-                    { name: 'Backstab', cooldown: 3, effect: 'guaranteed_crit', power: 1.5 }
-                ]
-            },
-            paladin: {
-                name: 'Paladin',
-                icon: '🛡️',
-                rarity: 'rare',
-                description: 'Holy warrior with healing powers',
-                xpModifier: 1.5, // Requires 50% more XP
-                bonuses: { hp: 30, attack: 4, defense: 6 },
-                abilities: [
-                    { name: 'Divine Heal', cooldown: 5, effect: 'heal', power: 0.3 },
-                    { name: 'Smite', cooldown: 4, effect: 'deal_damage', power: 2 }
-                ]
-            },
-            necromancer: {
-                name: 'Necromancer',
-                icon: '💀',
-                rarity: 'epic',
-                description: 'Master of death, gains power from kills',
-                xpModifier: 2.0, // Requires 100% more XP (double)
-                bonuses: { hp: 10, attack: 6, defense: 3, lifesteal: 15 },
-                abilities: [
-                    { name: 'Life Drain', cooldown: 3, effect: 'lifesteal', power: 1.5 },
-                    { name: 'Raise Dead', cooldown: 6, effect: 'summon', power: 0.5 }
-                ]
-            },
-            dragonborn: {
-                name: 'Dragonborn',
-                icon: '🐉',
-                rarity: 'legendary',
-                description: 'Ancient dragon blood, exponential growth',
-                xpModifier: 3.0, // Requires 200% more XP (triple)
-                bonuses: { hp: 50, attack: 10, defense: 8, critChance: 5 },
-                scaling: 1.15, // Stats grow 15% faster per level
-                abilities: [
-                    { name: 'Dragon Breath', cooldown: 5, effect: 'deal_damage', power: 3 },
-                    { name: 'Dragon Scales', cooldown: 6, effect: 'buff_defense', power: 2, duration: 3 }
-                ]
+        var ENEMIES = [
+            { name: 'Goblin', icon: '👹', hp: 50, attack: 8, defense: 2, gold: 10, xp: 20 },
+            { name: 'Orc', icon: '👺', hp: 80, attack: 12, defense: 5, gold: 15, xp: 30 },
+            { name: 'Troll', icon: '🧟', hp: 120, attack: 14, defense: 8, gold: 25, xp: 50 },
+            { name: 'Dragon', icon: '🐲', hp: 200, attack: 20, defense: 12, gold: 50, xp: 100 }
+        ];
+
+        var TALENTS = [
+            { id: 'power1', name: 'Power I', desc: '+5 Attack', cost: 1, bonus: { attack: 5 }, requires: null },
+            { id: 'power2', name: 'Power II', desc: '+10 Attack', cost: 1, bonus: { attack: 10 }, requires: 'power1' },
+            { id: 'power3', name: 'Power III', desc: '+15 Attack', cost: 1, bonus: { attack: 15 }, requires: 'power2' },
+            { id: 'defense1', name: 'Iron Skin I', desc: '+3 Defense', cost: 1, bonus: { defense: 3 }, requires: null },
+            { id: 'defense2', name: 'Iron Skin II', desc: '+6 Defense', cost: 1, bonus: { defense: 6 }, requires: 'defense1' },
+            { id: 'defense3', name: 'Iron Skin III', desc: '+10 Defense', cost: 1, bonus: { defense: 10 }, requires: 'defense2' },
+            { id: 'vitality1', name: 'Vitality I', desc: '+30 HP', cost: 1, bonus: { hp: 30 }, requires: null },
+            { id: 'vitality2', name: 'Vitality II', desc: '+50 HP', cost: 1, bonus: { hp: 50 }, requires: 'vitality1' },
+            { id: 'vitality3', name: 'Vitality III', desc: '+80 HP', cost: 1, bonus: { hp: 80 }, requires: 'vitality2' }
+        ];
+
+        var PETS = [
+            { id: 'wolf', name: 'Wolf', icon: '🐺', desc: '+5 Attack bonus', bonus: { attack: 5 }, cost: 100 },
+            { id: 'bear', name: 'Bear', icon: '🐻', desc: '+5 Defense bonus', bonus: { defense: 5 }, cost: 150 },
+            { id: 'phoenix', name: 'Phoenix', icon: '🔥', desc: 'Revive once per floor', bonus: { hp: 20 }, cost: 300, special: 'revive' },
+            { id: 'dragon', name: 'Baby Dragon', icon: '🦎', desc: 'All stats +3', bonus: { attack: 3, defense: 3, hp: 30 }, cost: 500 }
+        ];
+
+        function Game() {
+            this.player = null;
+            this.enemy = null;
+            this.floor = 1;
+            this.talentPoints = 0;
+            this.unlockedTalents = [];
+            this.activePet = null;
+            this.ownedPets = [];
+            this.cheatsUnlocked = false;
+            this.godMode = false;
+        }
+
+        Game.prototype.init = function() {
+            var container = document.getElementById('classSelection');
+            for (var key in CLASSES) {
+                var cls = CLASSES[key];
+                var card = document.createElement('div');
+                card.className = 'class-card';
+                card.innerHTML = '<div class="class-icon">' + cls.icon + '</div>' +
+                    '<div style="font-size: 1.3em; color: #ffd700; margin: 10px 0;">' + cls.name + '</div>' +
+                    '<div style="color: #aaa; margin-bottom: 10px;">' + cls.desc + '</div>' +
+                    '<div style="font-size: 0.9em;">HP: ' + (cls.bonuses.hp > 0 ? '+' : '') + cls.bonuses.hp + '<br>' +
+                    'ATK: +' + cls.bonuses.attack + '<br>DEF: +' + cls.bonuses.defense + '</div>';
+                card.setAttribute('data-class', key);
+                var self = this;
+                card.onclick = function() { self.selectClass(this.getAttribute('data-class')); };
+                container.appendChild(card);
             }
         };
 
-        // Enemy templates for procedural generation
-        const ENEMY_TEMPLATES = [
-            { name: 'Goblin', icon: '👹', hp: 50, attack: 8, defense: 2, gold: 5, xp: 20 },
-            { name: 'Skeleton', icon: '💀', hp: 60, attack: 10, defense: 3, gold: 7, xp: 25 },
-            { name: 'Orc', icon: '👺', hp: 80, attack: 12, defense: 5, gold: 10, xp: 30 },
-            { name: 'Dark Mage', icon: '🧙', hp: 70, attack: 15, defense: 2, gold: 15, xp: 35 },
-            { name: 'Troll', icon: '🧟', hp: 120, attack: 14, defense: 8, gold: 20, xp: 40 },
-            { name: 'Dragon', icon: '🐲', hp: 150, attack: 20, defense: 10, gold: 50, xp: 100 },
-            { name: 'Demon', icon: '😈', hp: 200, attack: 25, defense: 12, gold: 75, xp: 150 }
-        ];
+        Game.prototype.selectClass = function(classKey) {
+            var cls = CLASSES[classKey];
+            this.player = {
+                classKey: classKey,
+                name: cls.name,
+                icon: cls.icon,
+                level: 1,
+                xp: 0,
+                xpToLevel: 100,
+                maxHp: 100 + cls.bonuses.hp,
+                hp: 100 + cls.bonuses.hp,
+                attack: 10 + cls.bonuses.attack,
+                defense: 5 + cls.bonuses.defense,
+                gold: 0,
+                inventory: []
+            };
 
-        // Item generation system
-        const ITEM_TYPES = {
-            weapon: ['Rusty Sword', 'Steel Blade', 'Magic Staff', 'Cursed Dagger', 'Holy Sword', 'Dragon Slayer'],
-            armor: ['Leather Armor', 'Chain Mail', 'Plate Armor', 'Magic Robe', 'Dragon Scale', 'Celestial Armor'],
-            potion: ['Health Potion', 'Strength Potion', 'Defense Potion', 'Critical Potion']
+            document.getElementById('classSelectionScreen').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'grid';
+            this.spawnEnemy();
+            this.updateUI();
+            this.log('Welcome! Begin your climb!');
         };
 
-        const RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
-
-        // Anomaly system for floor modifiers
-        const ANOMALIES = [
-            { name: 'Blessed Floor', effect: 'player_buff', description: '+50% Attack', modifier: 1.5, stat: 'attack' },
-            { name: 'Cursed Floor', effect: 'player_debuff', description: '-25% Defense', modifier: 0.75, stat: 'defense' },
-            { name: 'Gold Rush', effect: 'gold_bonus', description: '2x Gold Drops', modifier: 2 },
-            { name: 'XP Boost', effect: 'xp_bonus', description: '2x XP Gain', modifier: 2 },
-            { name: 'Enemy Swarm', effect: 'enemy_buff', description: 'Enemies +50% HP', modifier: 1.5 },
-            { name: 'Lucky Floor', effect: 'drop_rate', description: '2x Item Drop Rate', modifier: 2 }
-        ];
-
-        // Achievement system
-        const ACHIEVEMENTS = [
-            { id: 'first_kill', name: 'First Blood', description: 'Defeat your first enemy', condition: 'kills', value: 1 },
-            { id: 'floor_10', name: 'Tower Climber', description: 'Reach floor 10', condition: 'floor', value: 10 },
-            { id: 'floor_25', name: 'Sky Walker', description: 'Reach floor 25', condition: 'floor', value: 25 },
-            { id: 'floor_50', name: 'Heaven Piercer', description: 'Reach floor 50', condition: 'floor', value: 50 },
-            { id: 'level_10', name: 'Veteran', description: 'Reach level 10', condition: 'level', value: 10 },
-            { id: 'rich', name: 'Wealthy', description: 'Accumulate 1000 gold', condition: 'gold', value: 1000 },
-            { id: 'legendary_item', name: 'Legendary Hunter', description: 'Obtain a legendary item', condition: 'legendary', value: 1 },
-            { id: 'prestige_1', name: 'Reborn', description: 'Prestige once', condition: 'prestige', value: 1 }
-        ];
-
-        // ============================================
-        // MAIN GAME CLASS
-        // ============================================
-        
-        class Game {
-            constructor() {
-                this.player = null;
-                this.currentEnemy = null;
-                this.floor = 1;
-                this.inCombat = false;
-                this.defending = false;
-                this.currentAnomaly = null;
-                this.prestigeLevel = 0;
-                this.statistics = {
-                    kills: 0,
-                    deaths: 0,
-                    goldEarned: 0,
-                    damageDealt: 0
-                };
-                this.unlockedAchievements = [];
-                this.eventLog = [];
-                this.abilityCooldowns = {};
-            }
-
-            // ============================================
-            // INITIALIZATION
-            // ============================================
+        Game.prototype.playerAttack = function() {
+            if (!this.enemy || this.enemy.hp <= 0) return;
             
-            init() {
-                this.displayClassSelection();
+            var damage = this.player.attack;
+            
+            if (this.activePet && this.activePet.bonus.attack) {
+                damage += this.activePet.bonus.attack;
             }
+            
+            damage = Math.max(1, damage - this.enemy.defense);
+            this.enemy.hp -= damage;
+            this.log('You attack for ' + damage + ' damage!');
+            
+            if (this.activePet) {
+                var petDamage = Math.floor(damage * 0.2);
+                this.enemy.hp -= petDamage;
+                this.log(this.activePet.name + ' deals ' + petDamage + ' damage!');
+            }
+            
+            if (this.enemy.hp <= 0) {
+                this.enemyDefeated();
+            } else {
+                var self = this;
+                setTimeout(function() { self.enemyAttack(); }, 500);
+            }
+            this.updateUI();
+        };
 
-            displayClassSelection() {
-                const container = document.getElementById('classSelection');
-                container.innerHTML = '';
-                
-                for (let classKey in CLASSES) {
-                    const classData = CLASSES[classKey];
-                    const card = document.createElement('div');
-                    card.className = 'class-card';
-                    card.innerHTML = `
-                        <div class="class-icon">${classData.icon}</div>
-                        <div class="class-name">${classData.name}</div>
-                        <div class="class-description">${classData.description}</div>
-                        <div class="class-rarity rarity-${classData.rarity}">
-                            ${classData.rarity.toUpperCase()} 
-                            ${classData.xpModifier > 1 ? `(${Math.round((classData.xpModifier - 1) * 100)}% slower leveling)` : ''}
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.85em;">
-                            ${classData.bonuses.hp ? `HP: +${classData.bonuses.hp}<br>` : ''}
-                            ${classData.bonuses.attack ? `ATK: +${classData.bonuses.attack}<br>` : ''}
-                            ${classData.bonuses.defense ? `DEF: +${classData.bonuses.defense}<br>` : ''}
-                            ${classData.bonuses.critChance ? `CRIT: +${classData.bonuses.critChance}%` : ''}
-                        </div>
-                    `;
-                    card.onclick = () => this.selectClass(classKey);
-                    container.appendChild(card);
+        Game.prototype.playerDefend = function() {
+            this.log('You defend!');
+            var self = this;
+            setTimeout(function() { self.enemyAttack(); }, 500);
+        };
+
+        Game.prototype.useAbility = function() {
+            var damage = Math.floor(this.player.attack * 2);
+            this.enemy.hp -= damage;
+            this.log('Ability! ' + damage + ' damage!');
+            
+            if (this.enemy.hp <= 0) {
+                this.enemyDefeated();
+            } else {
+                var self = this;
+                setTimeout(function() { self.enemyAttack(); }, 500);
+            }
+            this.updateUI();
+        };
+
+        Game.prototype.enemyAttack = function() {
+            if (!this.enemy || this.enemy.hp <= 0) return;
+            
+            if (this.godMode) {
+                this.log('God Mode: No damage taken!');
+                this.updateUI();
+                return;
+            }
+            
+            var defense = this.player.defense;
+            
+            if (this.activePet && this.activePet.bonus.defense) {
+                defense += this.activePet.bonus.defense;
+            }
+            
+            var damage = Math.max(1, this.enemy.attack - defense);
+            this.player.hp -= damage;
+            this.log(this.enemy.name + ' attacks for ' + damage + '!');
+            
+            if (this.player.hp <= 0) {
+                if (this.activePet && this.activePet.special === 'revive' && !this.activePet.reviveUsed) {
+                    this.player.hp = Math.floor(this.player.maxHp * 0.5);
+                    this.activePet.reviveUsed = true;
+                    this.log('Phoenix revives you with 50% HP!');
+                } else {
+                    this.log('Defeated! Restarting...');
+                    this.floor = 1;
+                    this.player.hp = this.player.maxHp;
+                    if (this.activePet && this.activePet.reviveUsed) {
+                        this.activePet.reviveUsed = false;
+                    }
+                    this.spawnEnemy();
                 }
             }
+            this.updateUI();
+        };
 
-            selectClass(classKey) {
-                const classData = CLASSES[classKey];
-                this.player = {
-                    class: classKey,
-                    className: classData.name,
-                    icon: classData.icon,
-                    level: 1,
-                    xp: 0,
-                    xpToLevel: 100,
-                    xpModifier: classData.xpModifier,
-                    maxHp: GAME_CONFIG.BASE_HP + (classData.bonuses.hp || 0),
-                    hp: GAME_CONFIG.BASE_HP + (classData.bonuses.hp || 0),
-                    attack: GAME_CONFIG.BASE_ATTACK + (classData.bonuses.attack || 0),
-                    defense: GAME_CONFIG.BASE_DEFENSE + (classData.bonuses.defense || 0),
-                    critChance: GAME_CONFIG.BASE_CRIT_CHANCE + (classData.bonuses.critChance || 0),
-                    gold: 0,
-                    inventory: [],
-                    equippedWeapon: null,
-                    equippedArmor: null,
-                    abilities: JSON.parse(JSON.stringify(classData.abilities)),
-                    statusEffects: [],
-                    lifesteal: classData.bonuses.lifesteal || 0,
-                    scaling: classData.scaling || 1.0
-                };
+        Game.prototype.enemyDefeated = function() {
+            this.player.gold += this.enemy.gold;
+            this.player.xp += this.enemy.xp;
+            this.log('Victory! +' + this.enemy.gold + ' gold, +' + this.enemy.xp + ' XP');
+            
+            if (this.activePet && this.activePet.reviveUsed) {
+                this.activePet.reviveUsed = false;
+            }
+            
+            if (Math.random() < 0.4) {
+                var item = this.generateItem();
+                this.player.inventory.push(item);
+                this.log('Found: ' + item.name + '!');
+            }
+            
+            while (this.player.xp >= this.player.xpToLevel) {
+                this.levelUp();
+            }
+            
+            document.getElementById('proceedBtn').style.display = 'block';
+            this.updateUI();
+        };
 
-                // Initialize ability cooldowns
-                this.player.abilities.forEach(ability => {
-                    this.abilityCooldowns[ability.name] = 0;
-                });
+        Game.prototype.levelUp = function() {
+            this.player.xp -= this.player.xpToLevel;
+            this.player.level++;
+            this.player.maxHp += 20;
+            this.player.hp = this.player.maxHp;
+            this.player.attack += 2;
+            this.player.defense += 2;
+            this.player.xpToLevel = Math.floor(this.player.xpToLevel * 1.2);
+            this.talentPoints++;
+            this.log('Level Up! Now level ' + this.player.level + '! +1 Talent Point');
+        };
 
+        Game.prototype.nextFloor = function() {
+            this.floor++;
+            this.spawnEnemy();
+            document.getElementById('proceedBtn').style.display = 'none';
+            this.updateUI();
+        };
+
+        Game.prototype.spawnEnemy = function() {
+            var template = ENEMIES[Math.min(Math.floor(this.floor / 5), ENEMIES.length - 1)];
+            var scaling = Math.pow(1.15, this.floor - 1);
+            
+            this.enemy = {
+                name: template.name,
+                icon: template.icon,
+                maxHp: Math.floor(template.hp * scaling),
+                hp: Math.floor(template.hp * scaling),
+                attack: Math.floor(template.attack * scaling),
+                defense: Math.floor(template.defense * scaling),
+                gold: Math.floor(template.gold * scaling),
+                xp: Math.floor(template.xp * scaling)
+            };
+            
+            this.log(this.enemy.name + ' appears!');
+            this.updateUI();
+        };
+
+        Game.prototype.generateItem = function() {
+            var types = ['weapon', 'armor'];
+            var type = types[Math.floor(Math.random() * types.length)];
+            var rarities = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+            var rarity = rarities[Math.min(Math.floor(Math.random() * 3), 4)];
+            var rarityMult = { common: 1, uncommon: 1.5, rare: 2, epic: 3, legendary: 5 }[rarity];
+            
+            var itemNames = {
+                weapon: ['Iron Sword', 'Steel Blade', 'Magic Staff', 'Dragon Slayer'],
+                armor: ['Leather Armor', 'Chain Mail', 'Plate Armor', 'Dragon Scale']
+            };
+            
+            var floorBonus = Math.floor(this.floor / 5);
+            var item = {
+                id: Date.now() + Math.random(),
+                name: itemNames[type][Math.floor(Math.random() * itemNames[type].length)],
+                type: type,
+                rarity: rarity
+            };
+            
+            if (type === 'weapon') {
+                item.attack = Math.floor((5 + floorBonus) * rarityMult);
+            } else {
+                item.defense = Math.floor((3 + floorBonus) * rarityMult);
+                item.hp = Math.floor((10 + floorBonus * 5) * rarityMult);
+            }
+            
+            return item;
+        };
+
+        Game.prototype.openShop = function() {
+            var modal = document.getElementById('shopModal');
+            var shopItems = document.getElementById('shopItems');
+            shopItems.innerHTML = '';
+            
+            for (var i = 0; i < 6; i++) {
+                var item = this.generateItem();
+                var price = Math.floor(50 + this.floor * 10);
+                
+                var itemDiv = document.createElement('div');
+                itemDiv.style.cssText = 'background: #0f3460; padding: 15px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between;';
+                itemDiv.innerHTML = '<div><div class="rarity-' + item.rarity + '" style="font-weight: bold;">' + item.name + '</div>' +
+                    '<div style="font-size: 0.9em; color: #aaa;">' + 
+                    (item.attack ? 'ATK: +' + item.attack + '<br>' : '') +
+                    (item.defense ? 'DEF: +' + item.defense + '<br>' : '') +
+                    (item.hp ? 'HP: +' + item.hp : '') + '</div></div>' +
+                    '<div><div style="color: #ffd700;">💰 ' + price + '</div>' +
+                    '<button class="btn" onclick="game.buyItem(' + i + ')">Buy</button></div>';
+                itemDiv.setAttribute('data-item', JSON.stringify({ item: item, price: price }));
+                shopItems.appendChild(itemDiv);
+            }
+            
+            modal.classList.add('show');
+        };
+
+        Game.prototype.buyItem = function(index) {
+            var shopItems = document.getElementById('shopItems');
+            var itemDiv = shopItems.children[index];
+            var data = JSON.parse(itemDiv.getAttribute('data-item'));
+            
+            if (this.player.gold >= data.price) {
+                this.player.gold -= data.price;
+                this.player.inventory.push(data.item);
+                this.log('Purchased ' + data.item.name + '!');
+                this.closeShop();
+                this.updateUI();
+            } else {
+                this.log('Not enough gold!');
+            }
+        };
+
+        Game.prototype.closeShop = function() {
+            document.getElementById('shopModal').classList.remove('show');
+        };
+
+        Game.prototype.openTalents = function() {
+            var modal = document.getElementById('talentModal');
+            var tree = document.getElementById('talentTree');
+            tree.innerHTML = '';
+            
+            document.getElementById('availablePoints').textContent = this.talentPoints;
+            
+            for (var i = 0; i < TALENTS.length; i++) {
+                var talent = TALENTS[i];
+                var unlocked = this.unlockedTalents.indexOf(talent.id) !== -1;
+                var canUnlock = !unlocked && this.talentPoints > 0 && 
+                    (!talent.requires || this.unlockedTalents.indexOf(talent.requires) !== -1);
+                
+                var node = document.createElement('div');
+                node.className = 'talent-node ' + (unlocked ? 'unlocked' : canUnlock ? '' : 'locked');
+                node.innerHTML = '<div style="font-size: 1.5em; margin-bottom: 10px;">' + (unlocked ? '✅' : '🔒') + '</div>' +
+                    '<div style="font-weight: bold; margin-bottom: 5px;">' + talent.name + '</div>' +
+                    '<div style="font-size: 0.85em; color: #aaa; margin-bottom: 5px;">' + talent.desc + '</div>' +
+                    '<div style="color: #ffd700;">Cost: ' + talent.cost + ' pt</div>';
+                
+                if (canUnlock) {
+                    node.setAttribute('data-talent-id', talent.id);
+                    var self = this;
+                    node.onclick = function() {
+                        self.unlockTalent(this.getAttribute('data-talent-id'));
+                    };
+                }
+                
+                tree.appendChild(node);
+            }
+            
+            modal.classList.add('show');
+        };
+
+        Game.prototype.unlockTalent = function(talentId) {
+            var talent = null;
+            for (var i = 0; i < TALENTS.length; i++) {
+                if (TALENTS[i].id === talentId) {
+                    talent = TALENTS[i];
+                    break;
+                }
+            }
+            
+            if (!talent || this.talentPoints < talent.cost) return;
+            
+            this.talentPoints -= talent.cost;
+            this.unlockedTalents.push(talentId);
+            
+            if (talent.bonus.attack) {
+                this.player.attack += talent.bonus.attack;
+            }
+            if (talent.bonus.defense) {
+                this.player.defense += talent.bonus.defense;
+            }
+            if (talent.bonus.hp) {
+                this.player.maxHp += talent.bonus.hp;
+                this.player.hp += talent.bonus.hp;
+            }
+            
+            this.log('Unlocked: ' + talent.name + '!');
+            this.openTalents();
+            this.updateUI();
+        };
+
+        Game.prototype.closeTalents = function() {
+            document.getElementById('talentModal').classList.remove('show');
+        };
+
+        Game.prototype.openPets = function() {
+            var modal = document.getElementById('petModal');
+            var list = document.getElementById('petList');
+            list.innerHTML = '';
+            
+            for (var i = 0; i < PETS.length; i++) {
+                var pet = PETS[i];
+                var owned = false;
+                var ownedPet = null;
+                for (var j = 0; j < this.ownedPets.length; j++) {
+                    if (this.ownedPets[j].id === pet.id) {
+                        owned = true;
+                        ownedPet = this.ownedPets[j];
+                        break;
+                    }
+                }
+                
+                var canBuy = !owned && this.player.gold >= pet.cost;
+                var isActive = this.activePet && this.activePet.id === pet.id;
+                
+                var card = document.createElement('div');
+                card.className = 'pet-card' + (isActive ? ' active' : '');
+                card.innerHTML = '<div><div style="font-size: 2em;">' + pet.icon + '</div></div>' +
+                    '<div style="flex: 1; margin: 0 15px;">' +
+                    '<div style="font-weight: bold; color: #ffd700; margin-bottom: 5px;">' + pet.name + '</div>' +
+                    '<div style="font-size: 0.85em; color: #aaa; margin-bottom: 5px;">' + pet.desc + '</div>' +
+                    '<div style="font-size: 0.85em;">' +
+                    (pet.bonus.attack ? 'ATK: +' + pet.bonus.attack + ' ' : '') +
+                    (pet.bonus.defense ? 'DEF: +' + pet.bonus.defense + ' ' : '') +
+                    (pet.bonus.hp ? 'HP: +' + pet.bonus.hp : '') + '</div>' +
+                    (!owned ? '<div style="color: #ffd700; margin-top: 5px;">Cost: ' + pet.cost + ' gold</div>' : '') +
+                    '</div><div>';
+                
+                if (owned) {
+                    card.innerHTML += '<button class="btn" onclick="game.activatePet(\'' + pet.id + '\')">' + (isActive ? 'Active' : 'Activate') + '</button>';
+                } else {
+                    card.innerHTML += '<button class="btn" ' + (!canBuy ? 'disabled' : '') + ' onclick="game.buyPet(\'' + pet.id + '\')">Buy</button>';
+                }
+                
+                card.innerHTML += '</div>';
+                list.appendChild(card);
+            }
+            
+            modal.classList.add('show');
+        };
+
+        Game.prototype.buyPet = function(petId) {
+            var pet = null;
+            for (var i = 0; i < PETS.length; i++) {
+                if (PETS[i].id === petId) {
+                    pet = PETS[i];
+                    break;
+                }
+            }
+            
+            if (!pet || this.player.gold < pet.cost) return;
+            
+            this.player.gold -= pet.cost;
+            var newPet = {
+                id: pet.id,
+                name: pet.name,
+                icon: pet.icon,
+                desc: pet.desc,
+                bonus: pet.bonus,
+                special: pet.special,
+                reviveUsed: false
+            };
+            this.ownedPets.push(newPet);
+            this.log('Purchased ' + pet.name + '!');
+            this.openPets();
+            this.updateUI();
+        };
+
+        Game.prototype.activatePet = function(petId) {
+            var pet = null;
+            for (var i = 0; i < this.ownedPets.length; i++) {
+                if (this.ownedPets[i].id === petId) {
+                    pet = this.ownedPets[i];
+                    break;
+                }
+            }
+            
+            if (!pet) return;
+            
+            this.activePet = pet;
+            this.log(pet.name + ' is now active!');
+            document.getElementById('petModal').classList.remove('show');
+            this.updateUI();
+        };
+
+        Game.prototype.closePets = function() {
+            document.getElementById('petModal').classList.remove('show');
+        };
+
+        Game.prototype.openCheats = function() {
+            document.getElementById('cheatModal').classList.add('show');
+            if (this.cheatsUnlocked) {
+                document.getElementById('cheatButtons').style.display = 'block';
+            }
+        };
+
+        Game.prototype.unlockCheats = function() {
+            var password = document.getElementById('cheatPassword').value;
+            if (password === 'tower123' || password === 'dev' || password === 'admin') {
+                this.cheatsUnlocked = true;
+                document.getElementById('cheatButtons').style.display = 'block';
+                this.log('Debug mode unlocked!');
+            } else {
+                alert('Incorrect password! Try: tower123');
+            }
+        };
+
+        Game.prototype.cheat = function(type) {
+            if (!this.cheatsUnlocked) return;
+            
+            switch(type) {
+                case 'gold':
+                    this.player.gold += 10000;
+                    this.log('CHEAT: +10000 gold');
+                    break;
+                case 'xp':
+                    this.player.xp += 5000;
+                    while (this.player.xp >= this.player.xpToLevel) {
+                        this.levelUp();
+                    }
+                    this.log('CHEAT: +5000 XP');
+                    break;
+                case 'level':
+                    for (var i = 0; i < 10; i++) {
+                        this.player.level++;
+                        this.player.maxHp += 20;
+                        this.player.hp = this.player.maxHp;
+                        this.player.attack += 2;
+                        this.player.defense += 2;
+                        this.talentPoints++;
+                    }
+                    this.log('CHEAT: +10 levels');
+                    break;
+                case 'talents':
+                    this.talentPoints += 10;
+                    this.log('CHEAT: +10 talent points');
+                    break;
+                case 'floor':
+                    this.floor += 10;
+                    this.spawnEnemy();
+                    this.log('CHEAT: +10 floors');
+                    break;
+                case 'godmode':
+                    this.godMode = !this.godMode;
+                    this.log('CHEAT: God Mode ' + (this.godMode ? 'ON' : 'OFF'));
+                    break;
+                case 'killEnemy':
+                    if (this.enemy) {
+                        this.enemy.hp = 0;
+                        this.enemyDefeated();
+                        this.log('CHEAT: Enemy killed');
+                    }
+                    break;
+                case 'allPets':
+                    for (var i = 0; i < PETS.length; i++) {
+                        var pet = PETS[i];
+                        var exists = false;
+                        for (var j = 0; j < this.ownedPets.length; j++) {
+                            if (this.ownedPets[j].id === pet.id) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            this.ownedPets.push({
+                                id: pet.id,
+                                name: pet.name,
+                                icon: pet.icon,
+                                desc: pet.desc,
+                                bonus: pet.bonus,
+                                special: pet.special,
+                                reviveUsed: false
+                            });
+                        }
+                    }
+                    this.log('CHEAT: All pets unlocked');
+                    break;
+                case 'legendary':
+                    var item = this.generateItem();
+                    item.rarity = 'legendary';
+                    item.attack = item.attack ? item.attack * 5 : undefined;
+                    item.defense = item.defense ? item.defense * 5 : undefined;
+                    item.hp = item.hp ? item.hp * 5 : undefined;
+                    this.player.inventory.push(item);
+                    this.log('CHEAT: Legendary item added');
+                    break;
+                case 'maxStats':
+                    this.player.attack += 100;
+                    this.player.defense += 100;
+                    this.player.maxHp += 1000;
+                    this.player.hp = this.player.maxHp;
+                    this.log('CHEAT: Max stats applied');
+                    break;
+            }
+            
+            this.updateUI();
+        };
+
+        Game.prototype.closeCheats = function() {
+            document.getElementById('cheatModal').classList.remove('show');
+        };
+
+        Game.prototype.equipItem = function(index) {
+            var item = this.player.inventory[index];
+            if (!item) return;
+            
+            if (item.type === 'weapon') {
+                this.player.attack += item.attack;
+            } else if (item.type === 'armor') {
+                this.player.defense += item.defense;
+                this.player.maxHp += item.hp;
+                this.player.hp += item.hp;
+            }
+            
+            this.log('Equipped ' + item.name + '!');
+            this.player.inventory.splice(index, 1);
+            this.updateUI();
+        };
+
+        Game.prototype.saveGame = function() {
+            localStorage.setItem('towerSave', JSON.stringify({ 
+                player: this.player, 
+                floor: this.floor,
+                talentPoints: this.talentPoints,
+                unlockedTalents: this.unlockedTalents,
+                activePet: this.activePet,
+                ownedPets: this.ownedPets
+            }));
+            this.log('Game saved!');
+        };
+
+        Game.prototype.loadGame = function() {
+            var data = localStorage.getItem('towerSave');
+            if (data) {
+                var save = JSON.parse(data);
+                this.player = save.player;
+                this.floor = save.floor;
+                this.talentPoints = save.talentPoints || 0;
+                this.unlockedTalents = save.unlockedTalents || [];
+                this.activePet = save.activePet || null;
+                this.ownedPets = save.ownedPets || [];
                 document.getElementById('classSelectionScreen').style.display = 'none';
                 document.getElementById('gameArea').style.display = 'grid';
-                
-                this.updateUI();
-                this.spawnEnemy();
-                this.logEvent('Welcome to the Endless Tower!', 'event');
-                this.logEvent(`You are a ${this.player.className}. Begin your ascent!`, 'event');
-            }
-
-            // ============================================
-            // COMBAT SYSTEM
-            // ============================================
-            
-            playerAttack() {
-                if (!this.inCombat || this.currentEnemy.hp <= 0) return;
-                
-                this.defending = false;
-                
-                // Calculate damage with bonuses from anomalies
-                let damage = this.player.attack;
-                if (this.currentAnomaly && this.currentAnomaly.effect === 'player_buff' && this.currentAnomaly.stat === 'attack') {
-                    damage *= this.currentAnomaly.modifier;
-                }
-                
-                // Critical hit calculation
-                const isCrit = Math.random() * 100 < this.player.critChance;
-                if (isCrit) {
-                    damage *= GAME_CONFIG.CRIT_MULTIPLIER;
-                }
-                
-                // Apply defense reduction
-                const finalDamage = Math.max(1, Math.floor(damage - this.currentEnemy.defense));
-                this.currentEnemy.hp -= finalDamage;
-                
-                this.showDamageNumber(finalDamage, 'enemy', isCrit);
-                this.logEvent(`You attack for ${finalDamage} damage! ${isCrit ? '⚡ CRITICAL HIT!' : ''}`, 'combat');
-                
-                // Lifesteal
-                if (this.player.lifesteal > 0) {
-                    const healAmount = Math.floor(finalDamage * (this.player.lifesteal / 100));
-                    this.healPlayer(healAmount);
-                }
-                
-                this.statistics.damageDealt += finalDamage;
-                
-                if (this.currentEnemy.hp <= 0) {
-                    this.enemyDefeated();
-                } else {
-                    setTimeout(() => this.enemyAttack(), 500);
-                }
-                
-                this.updateUI();
-            }
-
-            playerDefend() {
-                if (!this.inCombat || this.currentEnemy.hp <= 0) return;
-                
-                this.defending = true;
-                this.logEvent('You raise your shield and defend!', 'combat');
-                
-                setTimeout(() => this.enemyAttack(), 500);
-            }
-
-            useAbility() {
-                if (!this.inCombat || this.currentEnemy.hp <= 0) return;
-                if (this.player.abilities.length === 0) {
-                    this.logEvent('No abilities available!', 'combat');
-                    return;
-                }
-                
-                // Find first available ability (not on cooldown)
-                let ability = null;
-                for (let ab of this.player.abilities) {
-                    if (this.abilityCooldowns[ab.name] === 0) {
-                        ability = ab;
-                        break;
-                    }
-                }
-                
-                if (!ability) {
-                    this.logEvent('All abilities on cooldown!', 'combat');
-                    return;
-                }
-                
-                this.logEvent(`You use ${ability.name}!`, 'combat');
-                
-                // Execute ability effect
-                switch (ability.effect) {
-                    case 'deal_damage':
-                        const damage = Math.floor(this.player.attack * ability.power);
-                        this.currentEnemy.hp -= damage;
-                        this.showDamageNumber(damage, 'enemy', false);
-                        this.logEvent(`${ability.name} deals ${damage} damage!`, 'combat');
-                        break;
-                        
-                    case 'guaranteed_crit':
-                        const critDamage = Math.floor(this.player.attack * ability.power * GAME_CONFIG.CRIT_MULTIPLIER);
-                        this.currentEnemy.hp -= critDamage;
-                        this.showDamageNumber(critDamage, 'enemy', true);
-                        this.logEvent(`${ability.name} deals ${critDamage} critical damage!`, 'combat');
-                        break;
-                        
-                    case 'heal':
-                        const healAmount = Math.floor(this.player.maxHp * ability.power);
-                        this.healPlayer(healAmount);
-                        break;
-                        
-                    case 'lifesteal':
-                        const lsDamage = Math.floor(this.player.attack * ability.power);
-                        this.currentEnemy.hp -= lsDamage;
-                        this.healPlayer(lsDamage);
-                        this.showDamageNumber(lsDamage, 'enemy', false);
-                        break;
-                        
-                    case 'buff_defense':
-                        this.player.statusEffects.push({
-                            name: 'Increased Defense',
-                            stat: 'defense',
-                            modifier: ability.power,
-                            duration: ability.duration || 3
-                        });
-                        break;
-                        
-                    case 'summon':
-                        // Deal damage over time effect
-                        const summonDamage = Math.floor(this.player.attack * ability.power);
-                        this.currentEnemy.hp -= summonDamage;
-                        this.showDamageNumber(summonDamage, 'enemy', false);
-                        break;
-                }
-                
-                // Set cooldown
-                this.abilityCooldowns[ability.name] = ability.cooldown;
-                
-                if (this.currentEnemy.hp <= 0) {
-                    this.enemyDefeated();
-                } else {
-                    setTimeout(() => this.enemyAttack(), 500);
-                }
-                
-                this.updateUI();
-            }
-
-            enemyAttack() {
-                if (!this.inCombat || this.currentEnemy.hp <= 0) return;
-                
-                let damage = this.currentEnemy.attack;
-                
-                // Apply player defense
-                let defense = this.player.defense;
-                if (this.currentAnomaly && this.currentAnomaly.effect === 'player_debuff' && this.currentAnomaly.stat === 'defense') {
-                    defense *= this.currentAnomaly.modifier;
-                }
-                
-                // Check status effects
-                this.player.statusEffects.forEach(effect => {
-                    if (effect.stat === 'defense') {
-                        defense *= effect.modifier;
-                    }
-                });
-                
-                if (this.defending) {
-                    defense *= 2;
-                    this.defending = false;
-                }
-                
-                const finalDamage = Math.max(1, Math.floor(damage - defense));
-                this.player.hp -= finalDamage;
-                
-                this.showDamageNumber(finalDamage, 'player', false);
-                this.logEvent(`${this.currentEnemy.name} attacks for ${finalDamage} damage!`, 'combat');
-                
-                // Decrease status effect durations
-                this.player.statusEffects = this.player.statusEffects.filter(effect => {
-                    effect.duration--;
-                    return effect.duration > 0;
-                });
-                
-                // Decrease ability cooldowns
-                for (let abilityName in this.abilityCooldowns) {
-                    if (this.abilityCooldowns[abilityName] > 0) {
-                        this.abilityCooldowns[abilityName]--;
-                    }
-                }
-                
-                if (this.player.hp <= 0) {
-                    this.playerDeath();
-                }
-                
-                this.updateUI();
-            }
-
-            enemyDefeated() {
-                this.inCombat = false;
-                this.statistics.kills++;
-                
-                // Calculate rewards with anomaly bonuses
-                let goldReward = this.currentEnemy.gold + (this.floor * GAME_CONFIG.GOLD_PER_FLOOR);
-                let xpReward = this.currentEnemy.xp;
-                
-                if (this.currentAnomaly) {
-                    if (this.currentAnomaly.effect === 'gold_bonus') {
-                        goldReward *= this.currentAnomaly.modifier;
-                    }
-                    if (this.currentAnomaly.effect === 'xp_bonus') {
-                        xpReward *= this.currentAnomaly.modifier;
-                    }
-                }
-                
-                goldReward = Math.floor(goldReward);
-                xpReward = Math.floor(xpReward);
-                
-                this.player.gold += goldReward;
-                this.statistics.goldEarned += goldReward;
-                
-                this.logEvent(`Victory! Gained ${goldReward} gold and ${xpReward} XP!`, 'combat');
-                this.gainXP(xpReward);
-                
-                // Random item drop
-                if (Math.random() < 0.3) { // 30% base drop rate
-                    let dropRate = 0.3;
-                    if (this.currentAnomaly && this.currentAnomaly.effect === 'drop_rate') {
-                        dropRate *= this.currentAnomaly.modifier;
-                    }
-                    
-                    if (Math.random() < dropRate) {
-                        const item = this.generateItem(this.floor);
-                        this.player.inventory.push(item);
-                        this.logEvent(`Found: ${item.name}!`, 'item');
-                    }
-                }
-                
-                // Random event chance
-                if (Math.random() < 0.15) { // 15% chance
-                    this.triggerRandomEvent();
-                }
-                
-                // Check achievements
-                this.checkAchievements();
-                
-                document.getElementById('proceedBtn').style.display = 'block';
-                document.getElementById('enemyContainer').style.opacity = '0.5';
-                
-                this.updateUI();
-            }
-
-            playerDeath() {
-                this.statistics.deaths++;
-                this.logEvent('You have been defeated!', 'combat');
-                
-                // Penalty: lose some gold and reset to floor 1
-                const goldLost = Math.floor(this.player.gold * 0.3);
-                this.player.gold -= goldLost;
-                this.floor = 1;
-                this.player.hp = this.player.maxHp;
-                
-                this.logEvent(`Lost ${goldLost} gold. Retreating to floor 1...`, 'event');
-                
-                this.currentAnomaly = null;
                 this.spawnEnemy();
                 this.updateUI();
-            }
-
-            // ============================================
-            // PROGRESSION SYSTEM
-            // ============================================
-            
-            gainXP(amount) {
-                // Apply class XP modifier
-                const adjustedXP = Math.floor(amount / this.player.xpModifier);
-                this.player.xp += adjustedXP;
-                
-                while (this.player.xp >= this.player.xpToLevel) {
-                    this.levelUp();
-                }
-                
-                this.updateUI();
-            }
-
-            levelUp() {
-                this.player.xp -= this.player.xpToLevel;
-                this.player.level++;
-                
-                // Apply scaling bonuses (for special classes like Dragonborn)
-                const scalingBonus = this.player.scaling;
-                
-                this.player.maxHp += Math.floor(GAME_CONFIG.LEVEL_UP_HP_BONUS * scalingBonus);
-                this.player.hp = this.player.maxHp;
-                this.player.attack += Math.floor(GAME_CONFIG.LEVEL_UP_STAT_BONUS * scalingBonus);
-                this.player.defense += Math.floor(GAME_CONFIG.LEVEL_UP_STAT_BONUS * scalingBonus);
-                
-                // Increase XP requirement (exponential curve)
-                this.player.xpToLevel = Math.floor(this.player.xpToLevel * 1.2 * this.player.xpModifier);
-                
-                this.logEvent(`⭐ LEVEL UP! You are now level ${this.player.level}!`, 'level');
-                this.logEvent(`HP +${Math.floor(GAME_CONFIG.LEVEL_UP_HP_BONUS * scalingBonus)}, ATK +${Math.floor(GAME_CONFIG.LEVEL_UP_STAT_BONUS * scalingBonus)}, DEF +${Math.floor(GAME_CONFIG.LEVEL_UP_STAT_BONUS * scalingBonus)}`, 'level');
-                
-                // Class evolution check (every 10 levels)
-                if (this.player.level % 10 === 0) {
-                    this.checkClassEvolution();
-                }
-                
-                this.checkAchievements();
-                this.updateUI();
-            }
-
-            checkClassEvolution() {
-                // Placeholder for class evolution system
-                // Future: Allow classes to evolve into advanced versions
-                this.logEvent(`🌟 Your ${this.player.className} power grows stronger!`, 'level');
-                
-                // Grant bonus ability or stat boost
-                const bonusType = Math.random();
-                if (bonusType < 0.5) {
-                    this.player.critChance += 5;
-                    this.logEvent('Critical chance increased by 5%!', 'level');
-                } else {
-                    this.player.attack += 5;
-                    this.logEvent('Attack increased by 5!', 'level');
-                }
-            }
-
-            healPlayer(amount) {
-                const actualHeal = Math.min(amount, this.player.maxHp - this.player.hp);
-                this.player.hp += actualHeal;
-                this.showDamageNumber(actualHeal, 'player', false, true);
-                this.logEvent(`Healed for ${actualHeal} HP!`, 'combat');
-            }
-
-            // ============================================
-            // FLOOR & ENEMY GENERATION
-            // ============================================
-            
-            nextFloor() {
-                this.floor++;
-                this.currentAnomaly = null;
-                
-                // Random anomaly chance (20%)
-                if (Math.random() < 0.2) {
-                    this.currentAnomaly = ANOMALIES[Math.floor(Math.random() * ANOMALIES.length)];
-                    this.logEvent(`⚠️ Anomaly: ${this.currentAnomaly.name} - ${this.currentAnomaly.description}`, 'event');
-                }
-                
-                // Check for prestige availability
-                if (this.floor >= GAME_CONFIG.PRESTIGE_FLOOR_REQUIREMENT) {
-                    document.getElementById('prestigePanel').style.display = 'block';
-                }
-                
-                this.spawnEnemy();
-                this.checkAchievements();
-                document.getElementById('proceedBtn').style.display = 'none';
-                document.getElementById('enemyContainer').style.opacity = '1';
-                this.updateUI();
-            }
-
-            spawnEnemy() {
-                // Select enemy template based on floor
-                const templateIndex = Math.min(
-                    Math.floor(this.floor / 5),
-                    ENEMY_TEMPLATES.length - 1
-                );
-                const template = ENEMY_TEMPLATES[templateIndex];
-                
-                // Scale enemy stats based on floor
-                const scaling = Math.pow(GAME_CONFIG.ENEMY_SCALING, this.floor - 1);
-                
-                this.currentEnemy = {
-                    name: template.name,
-                    icon: template.icon,
-                    maxHp: Math.floor(template.hp * scaling),
-                    hp: Math.floor(template.hp * scaling),
-                    attack: Math.floor(template.attack * scaling),
-                    defense: Math.floor(template.defense * scaling),
-                    gold: Math.floor(template.gold * scaling),
-                    xp: Math.floor(template.xp * scaling)
-                };
-                
-                // Apply anomaly effects
-                if (this.currentAnomaly && this.currentAnomaly.effect === 'enemy_buff') {
-                    this.currentEnemy.maxHp = Math.floor(this.currentEnemy.maxHp * this.currentAnomaly.modifier);
-                    this.currentEnemy.hp = this.currentEnemy.maxHp;
-                }
-                
-                this.inCombat = true;
-                this.logEvent(`A ${this.currentEnemy.name} appears!`, 'combat');
-                this.updateUI();
-            }
-
-            // ============================================
-            // ITEM SYSTEM
-            // ============================================
-            
-            generateItem(floor) {
-                // Determine item type
-                const types = ['weapon', 'armor', 'potion'];
-                const type = types[Math.floor(Math.random() * types.length)];
-                
-                // Determine rarity based on floor
-                let rarityRoll = Math.random() * 100;
-                rarityRoll += floor * 0.5; // Higher floors = better items
-                
-                let rarity;
-                if (rarityRoll < 50) rarity = 'common';
-                else if (rarityRoll < 75) rarity = 'uncommon';
-                else if (rarityRoll < 90) rarity = 'rare';
-                else if (rarityRoll < 97) rarity = 'epic';
-                else rarity = 'legendary';
-                
-                // Generate stats based on rarity
-                const rarityMultipliers = {
-                    common: 1,
-                    uncommon: 1.5,
-                    rare: 2,
-                    epic: 3,
-                    legendary: 5
-                };
-                
-                const mult = rarityMultipliers[rarity];
-                const floorBonus = Math.floor(floor / 5);
-                
-                const item = {
-                    id: Date.now() + Math.random(),
-                    type: type,
-                    name: ITEM_TYPES[type][Math.floor(Math.random() * ITEM_TYPES[type].length)],
-                    rarity: rarity,
-                    equipped: false
-                };
-                
-                if (type === 'weapon') {
-                    item.attack = Math.floor((5 + floorBonus) * mult);
-                    item.critChance = Math.floor(Math.random() * 5 * mult);
-                } else if (type === 'armor') {
-                    item.defense = Math.floor((3 + floorBonus) * mult);
-                    item.hp = Math.floor((10 + floorBonus * 5) * mult);
-                } else if (type === 'potion') {
-                    item.consumable = true;
-                    item.effect = 'heal';
-                    item.value = Math.floor(50 * mult);
-                }
-                
-                if (rarity === 'legendary') {
-                    this.checkAchievements();
-                }
-                
-                return item;
-            }
-
-            equipItem(item) {
-                if (item.consumable) {
-                    // Use consumable
-                    if (item.effect === 'heal') {
-                        this.healPlayer(item.value);
-                    }
-                    this.player.inventory = this.player.inventory.filter(i => i.id !== item.id);
-                    this.logEvent(`Used ${item.name}!`, 'item');
-                } else if (item.type === 'weapon') {
-                    // Unequip current weapon
-                    if (this.player.equippedWeapon) {
-                        this.player.attack -= this.player.equippedWeapon.attack;
-                        this.player.critChance -= this.player.equippedWeapon.critChance || 0;
-                        this.player.equippedWeapon.equipped = false;
-                    }
-                    // Equip new weapon
-                    this.player.equippedWeapon = item;
-                    item.equipped = true;
-                    this.player.attack += item.attack;
-                    this.player.critChance += item.critChance || 0;
-                    this.logEvent(`Equipped ${item.name}!`, 'item');
-                } else if (item.type === 'armor') {
-                    // Unequip current armor
-                    if (this.player.equippedArmor) {
-                        this.player.defense -= this.player.equippedArmor.defense;
-                        this.player.maxHp -= this.player.equippedArmor.hp || 0;
-                        this.player.hp = Math.min(this.player.hp, this.player.maxHp);
-                        this.player.equippedArmor.equipped = false;
-                    }
-                    // Equip new armor
-                    this.player.equippedArmor = item;
-                    item.equipped = true;
-                    this.player.defense += item.defense;
-                    this.player.maxHp += item.hp || 0;
-                    this.logEvent(`Equipped ${item.name}!`, 'item');
-                }
-                
-                this.updateUI();
-            }
-
-            // ============================================
-            // RANDOM EVENTS SYSTEM
-            // ============================================
-            
-            triggerRandomEvent() {
-                const events = [
-                    {
-                        name: 'Mysterious Merchant',
-                        description: 'A merchant offers you a deal: 50 gold for a random rare item.',
-                        action: () => {
-                            if (this.player.gold >= 50) {
-                                this.player.gold -= 50;
-                                const item = this.generateItem(this.floor + 10);
-                                item.rarity = 'rare';
-                                this.player.inventory.push(item);
-                                this.logEvent(`Purchased ${item.name} from merchant!`, 'event');
-                            } else {
-                                this.logEvent('Not enough gold!', 'event');
-                            }
-                        }
-                    },
-                    {
-                        name: 'Healing Fountain',
-                        description: 'You find a magical fountain and restore all HP!',
-                        action: () => {
-                            this.player.hp = this.player.maxHp;
-                            this.logEvent('Fully healed at the fountain!', 'event');
-                        }
-                    },
-                    {
-                        name: 'Treasure Chest',
-                        description: 'You discover a treasure chest!',
-                        action: () => {
-                            const goldFound = Math.floor(100 + this.floor * 20);
-                            this.player.gold += goldFound;
-                            this.logEvent(`Found ${goldFound} gold in the chest!`, 'event');
-                        }
-                    },
-                    {
-                        name: 'Ancient Shrine',
-                        description: 'You pray at an ancient shrine and receive a blessing.',
-                        action: () => {
-                            const bonusType = Math.floor(Math.random() * 3);
-                            if (bonusType === 0) {
-                                this.player.attack += 3;
-                                this.logEvent('Attack permanently increased by 3!', 'event');
-                            } else if (bonusType === 1) {
-                                this.player.defense += 3;
-                                this.logEvent('Defense permanently increased by 3!', 'event');
-                            } else {
-                                this.player.maxHp += 20;
-                                this.player.hp += 20;
-                                this.logEvent('Max HP permanently increased by 20!', 'event');
-                            }
-                        }
-                    },
-                    {
-                        name: 'Cursed Artifact',
-                        description: 'You touch a cursed artifact! High risk, high reward.',
-                        action: () => {
-                            if (Math.random() < 0.5) {
-                                this.player.attack += 10;
-                                this.logEvent('The curse empowers you! Attack +10!', 'event');
-                            } else {
-                                const damage = Math.floor(this.player.maxHp * 0.3);
-                                this.player.hp -= damage;
-                                this.logEvent(`The curse damages you for ${damage} HP!`, 'event');
-                                if (this.player.hp <= 0) this.playerDeath();
-                            }
-                        }
-                    }
-                ];
-                
-                const event = events[Math.floor(Math.random() * events.length)];
-                this.logEvent(`⭐ ${event.name}: ${event.description}`, 'event');
-                event.action();
-                this.updateUI();
-            }
-
-            // ============================================
-            // SHOP SYSTEM
-            // ============================================
-            
-            openShop() {
-                const modal = document.getElementById('shopModal');
-                const shopItems = document.getElementById('shopItems');
-                shopItems.innerHTML = '';
-                
-                // Generate shop items
-                for (let i = 0; i < 6; i++) {
-                    const item = this.generateItem(this.floor);
-                    const price = Math.floor(100 * (RARITIES.indexOf(item.rarity) + 1) * (1 + this.floor / 10));
-                    
-                    const shopItem = document.createElement('div');
-                    shopItem.className = 'shop-item';
-                    shopItem.innerHTML = `
-                        <div>
-                            <div class="item-name rarity-${item.rarity}">${item.name}</div>
-                            <div class="item-stats">
-                                ${item.attack ? `ATK: +${item.attack} ` : ''}
-                                ${item.defense ? `DEF: +${item.defense} ` : ''}
-                                ${item.hp ? `HP: +${item.hp} ` : ''}
-                                ${item.value ? `Heal: ${item.value} ` : ''}
-                            </div>
-                        </div>
-                        <div>
-                            <div style="color: #ffd700; margin-bottom: 5px;">💰 ${price}</div>
-                            <button class="btn" onclick="game.buyItem(${JSON.stringify(item).replace(/"/g, '&quot;')}, ${price})">Buy</button>
-                        </div>
-                    `;
-                    shopItems.appendChild(shopItem);
-                }
-                
-                modal.classList.add('show');
-            }
-
-            buyItem(item, price) {
-                if (this.player.gold >= price) {
-                    this.player.gold -= price;
-                    item.id = Date.now() + Math.random(); // Generate new ID
-                    this.player.inventory.push(item);
-                    this.logEvent(`Purchased ${item.name} for ${price} gold!`, 'item');
-                    this.closeShop();
-                    this.updateUI();
-                } else {
-                    this.logEvent('Not enough gold!', 'event');
-                }
-            }
-
-            closeShop() {
-                document.getElementById('shopModal').classList.remove('show');
-            }
-
-            // ============================================
-            // ACHIEVEMENT SYSTEM
-            // ============================================
-            
-            checkAchievements() {
-                ACHIEVEMENTS.forEach(achievement => {
-                    const unlocked = this.unlockedAchievements.includes(achievement.id);
-                    const achievementDiv = document.createElement('div');
-                    achievementDiv.className = 'shop-item';
-                    achievementDiv.style.opacity = unlocked ? '1' : '0.5';
-                    achievementDiv.innerHTML = `
-                        <div>
-                            <div style="font-size: 2em;">${unlocked ? '🏆' : '🔒'}</div>
-                        </div>
-                        <div>
-                            <div class="item-name">${achievement.name}</div>
-                            <div class="item-stats">${achievement.description}</div>
-                        </div>
-                    `;
-                    list.appendChild(achievementDiv);
-                });
-                
-                modal.classList.add('show');
-            }
-
-            closeAchievements() {
-                document.getElementById('achievementModal').classList.remove('show');
-            }
-
-            // ============================================
-            // PRESTIGE SYSTEM
-            // ============================================
-            
-            prestige() {
-                if (this.floor < GAME_CONFIG.PRESTIGE_FLOOR_REQUIREMENT) {
-                    this.logEvent('You must reach floor 50 to prestige!', 'event');
-                    return;
-                }
-                
-                this.prestigeLevel++;
-                
-                // Store prestige bonuses
-                const prestigeBonus = {
-                    attack: Math.floor(this.player.attack * 0.1),
-                    defense: Math.floor(this.player.defense * 0.1),
-                    hp: Math.floor(this.player.maxHp * 0.1)
-                };
-                
-                this.logEvent(`🌟 PRESTIGE ${this.prestigeLevel}! You will restart with bonuses!`, 'event');
-                
-                // Reset player but keep some stats
-                const classData = CLASSES[this.player.class];
-                this.player.level = 1;
-                this.player.xp = 0;
-                this.player.xpToLevel = 100;
-                this.player.maxHp = GAME_CONFIG.BASE_HP + (classData.bonuses.hp || 0) + (prestigeBonus.hp * this.prestigeLevel);
-                this.player.hp = this.player.maxHp;
-                this.player.attack = GAME_CONFIG.BASE_ATTACK + (classData.bonuses.attack || 0) + (prestigeBonus.attack * this.prestigeLevel);
-                this.player.defense = GAME_CONFIG.BASE_DEFENSE + (classData.bonuses.defense || 0) + (prestigeBonus.defense * this.prestigeLevel);
-                this.player.inventory = [];
-                this.player.equippedWeapon = null;
-                this.player.equippedArmor = null;
-                
-                this.floor = 1;
-                this.currentAnomaly = null;
-                document.getElementById('prestigePanel').style.display = 'none';
-                
-                this.checkAchievements();
-                this.spawnEnemy();
-                this.updateUI();
-            }
-
-            // ============================================
-            // SAVE/LOAD SYSTEM
-            // ============================================
-            
-            saveGame() {
-                const saveData = {
-                    player: this.player,
-                    floor: this.floor,
-                    prestigeLevel: this.prestigeLevel,
-                    statistics: this.statistics,
-                    unlockedAchievements: this.unlockedAchievements
-                };
-                
-                localStorage.setItem(GAME_CONFIG.SAVE_KEY, JSON.stringify(saveData));
-                this.logEvent('Game saved!', 'event');
-            }
-
-            loadGame() {
-                const saveData = localStorage.getItem(GAME_CONFIG.SAVE_KEY);
-                
-                if (!saveData) {
-                    this.logEvent('No save data found!', 'event');
-                    return;
-                }
-                
-                try {
-                    const data = JSON.parse(saveData);
-                    this.player = data.player;
-                    this.floor = data.floor;
-                    this.prestigeLevel = data.prestigeLevel || 0;
-                    this.statistics = data.statistics;
-                    this.unlockedAchievements = data.unlockedAchievements || [];
-                    
-                    // Initialize ability cooldowns
-                    this.abilityCooldowns = {};
-                    this.player.abilities.forEach(ability => {
-                        this.abilityCooldowns[ability.name] = 0;
-                    });
-                    
-                    document.getElementById('classSelectionScreen').style.display = 'none';
-                    document.getElementById('gameArea').style.display = 'grid';
-                    
-                    this.spawnEnemy();
-                    this.logEvent('Game loaded!', 'event');
-                    this.updateUI();
-                } catch (e) {
-                    this.logEvent('Failed to load game!', 'event');
-                    console.error(e);
-                }
-            }
-
-            // ============================================
-            // UI UPDATES
-            // ============================================
-            
-            updateUI() {
-                if (!this.player) return;
-                
-                // Character panel
-                document.getElementById('className').textContent = this.player.className;
-                document.getElementById('charLevel').textContent = this.player.level;
-                document.getElementById('charHP').textContent = `${this.player.hp}/${this.player.maxHp}`;
-                document.getElementById('charXP').textContent = `${this.player.xp}/${this.player.xpToLevel}`;
-                document.getElementById('charAttack').textContent = this.player.attack;
-                document.getElementById('charDefense').textContent = this.player.defense;
-                document.getElementById('charCrit').textContent = `${this.player.critChance}%`;
-                document.getElementById('charGold').textContent = `💰 ${this.player.gold}`;
-                
-                // Progress bars
-                const hpPercent = (this.player.hp / this.player.maxHp) * 100;
-                document.getElementById('hpBar').style.width = `${hpPercent}%`;
-                document.getElementById('hpBar').textContent = `${Math.floor(hpPercent)}%`;
-                
-                const xpPercent = (this.player.xp / this.player.xpToLevel) * 100;
-                document.getElementById('xpBar').style.width = `${xpPercent}%`;
-                document.getElementById('xpBar').textContent = `${Math.floor(xpPercent)}%`;
-                
-                // Abilities
-                const abilityList = document.getElementById('abilityList');
-                abilityList.innerHTML = '';
-                this.player.abilities.forEach(ability => {
-                    const cooldown = this.abilityCooldowns[ability.name] || 0;
-                    const abilityDiv = document.createElement('div');
-                    abilityDiv.className = 'ability-item';
-                    abilityDiv.innerHTML = `
-                        <div class="ability-name">${ability.name}</div>
-                        ${cooldown > 0 ? `<div class="ability-cooldown">Cooldown: ${cooldown}</div>` : '<div style="color: #00ff00;">Ready</div>'}
-                    `;
-                    abilityList.appendChild(abilityDiv);
-                });
-                
-                // Status effects
-                const statusContainer = document.getElementById('statusEffects');
-                statusContainer.innerHTML = '';
-                this.player.statusEffects.forEach(effect => {
-                    const statusDiv = document.createElement('div');
-                    statusDiv.className = 'status-effect';
-                    statusDiv.textContent = `${effect.name} (${effect.duration})`;
-                    statusContainer.appendChild(statusDiv);
-                });
-                
-                // Floor display
-                document.getElementById('floorNumber').textContent = this.floor;
-                const anomalyDisplay = document.getElementById('anomalyDisplay');
-                if (this.currentAnomaly) {
-                    anomalyDisplay.textContent = `⚠️ ${this.currentAnomaly.name}`;
-                } else {
-                    anomalyDisplay.textContent = '';
-                }
-                
-                // Enemy display
-                if (this.currentEnemy) {
-                    document.getElementById('enemySprite').textContent = this.currentEnemy.icon;
-                    document.getElementById('enemyName').textContent = this.currentEnemy.name;
-                    document.getElementById('enemyHP').textContent = `HP: ${Math.max(0, this.currentEnemy.hp)}/${this.currentEnemy.maxHp}`;
-                }
-                
-                // Inventory
-                this.updateInventoryUI();
-                
-                // Player sprite
-                document.getElementById('playerSprite').textContent = this.player.icon;
-            }
-
-            updateInventoryUI() {
-                // Equipped items
-                const weaponSlot = document.getElementById('equippedWeapon');
-                if (this.player.equippedWeapon) {
-                    const w = this.player.equippedWeapon;
-                    weaponSlot.innerHTML = `
-                        <div class="item-name rarity-${w.rarity}">${w.name}</div>
-                        <div class="item-stats">ATK: +${w.attack} ${w.critChance ? `CRIT: +${w.critChance}%` : ''}</div>
-                    `;
-                } else {
-                    weaponSlot.innerHTML = '<div style="color: #aaa;">None</div>';
-                }
-                
-                const armorSlot = document.getElementById('equippedArmor');
-                if (this.player.equippedArmor) {
-                    const a = this.player.equippedArmor;
-                    armorSlot.innerHTML = `
-                        <div class="item-name rarity-${a.rarity}">${a.name}</div>
-                        <div class="item-stats">DEF: +${a.defense} ${a.hp ? `HP: +${a.hp}` : ''}</div>
-                    `;
-                } else {
-                    armorSlot.innerHTML = '<div style="color: #aaa;">None</div>';
-                }
-                
-                // Inventory grid
-                const inventoryGrid = document.getElementById('inventoryGrid');
-                inventoryGrid.innerHTML = '';
-                
-                this.player.inventory.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'item-slot';
-                    if (item.equipped) itemDiv.classList.add('equipped');
-                    
-                    itemDiv.innerHTML = `
-                        <div class="item-name rarity-${item.rarity}">${item.name}</div>
-                        <div class="item-stats">
-                            ${item.attack ? `ATK: +${item.attack}<br>` : ''}
-                            ${item.defense ? `DEF: +${item.defense}<br>` : ''}
-                            ${item.hp ? `HP: +${item.hp}<br>` : ''}
-                            ${item.critChance ? `CRIT: +${item.critChance}%<br>` : ''}
-                            ${item.value ? `Heal: ${item.value}<br>` : ''}
-                            ${item.consumable ? '(Consumable)' : ''}
-                        </div>
-                    `;
-                    
-                    itemDiv.onclick = () => this.equipItem(item);
-                    inventoryGrid.appendChild(itemDiv);
-                });
-            }
-
-            // ============================================
-            // VISUAL EFFECTS
-            // ============================================
-            
-            showDamageNumber(amount, target, isCrit = false, isHeal = false) {
-                const container = target === 'enemy' ? 
-                    document.querySelector('.enemy-sprite') : 
-                    document.querySelector('.character-sprite');
-                
-                const damageNum = document.createElement('div');
-                damageNum.className = 'damage-number';
-                if (isCrit) damageNum.classList.add('crit-number');
-                if (isHeal) damageNum.classList.add('heal-number');
-                
-                damageNum.textContent = isHeal ? `+${amount}` : `-${amount}`;
-                damageNum.style.left = `${Math.random() * 40 + 20}px`;
-                damageNum.style.top = `-20px`;
-                
-                container.appendChild(damageNum);
-                
-                setTimeout(() => {
-                    damageNum.remove();
-                }, 1000);
-                
-                // Animate sprite
-                container.style.transform = target === 'enemy' ? 'translateX(-10px)' : 'translateX(10px)';
-                setTimeout(() => {
-                    container.style.transform = '';
-                }, 200);
-            }
-
-            // ============================================
-            // EVENT LOGGING
-            // ============================================
-            
-            logEvent(message, type = 'event') {
-                const log = document.getElementById('eventLog');
-                const entry = document.createElement('div');
-                entry.className = `log-entry log-${type}`;
-                entry.textContent = `> ${message}`;
-                
-                log.insertBefore(entry, log.firstChild);
-                
-                // Keep only last 20 entries
-                while (log.children.length > 20) {
-                    log.removeChild(log.lastChild);
-                }
-            }
-        }
-
-        // ============================================
-        // GAME INITIALIZATION
-        // ============================================
-        
-        const game = new Game();
-        
-        // Auto-load on page load
-        window.onload = () => {
-            game.init();
-            
-            // Check for auto-load
-            const hasSave = localStorage.getItem(GAME_CONFIG.SAVE_KEY);
-            if (hasSave) {
-                const autoLoad = confirm('Save game found! Would you like to load it?');
-                if (autoLoad) {
-                    game.loadGame();
-                }
+                this.log('Game loaded!');
             }
         };
-        
-        // Auto-save every 30 seconds
-        setInterval(() => {
-            if (game.player) {
-                game.saveGame();
-            }
-        }, 30000);
 
-        // ============================================
-        // FUTURE EXPANSION HOOKS
-        // ============================================
-        
-        /*
-         * EXPANSION IDEAS:
-         * 
-         * 1. MULTIPLAYER SYSTEM:
-         *    - Add WebSocket connection for real-time co-op
-         *    - Implement turn-based PvP arena
-         *    - Leaderboard with Firebase/backend integration
-         * 
-         * 2. NEW CLASSES:
-         *    - Monk: Fast attacks, combo system
-         *    - Ranger: Distance attacks, pet system
-         *    - Alchemist: Potion crafting, elemental damage
-         *    - Berserker: High risk/reward, rage mechanic
-         * 
-         * 3. ADVANCED COMBAT:
-         *    - Elemental system (fire, ice, lightning)
-         *    - Combo chains for bonus damage
-         *    - Dodge/parry mechanics
-         *    - Enemy AI with different behaviors
-         * 
-         * 4. EXPANDED PROGRESSION:
-         *    - Skill trees with branching paths
-         *    - Equipment sets with bonuses
-         *    - Enchantment system for items
-         *    - Pet/companion system
-         * 
-         * 5. PROCEDURAL GENERATION:
-         *    - Different tower themes (ice, fire, shadow)
-         *    - Trap systems on floors
-         *    - Puzzle rooms for bonus rewards
-         *    - Boss floors every 10 levels
-         * 
-         * 6. SOCIAL FEATURES:
-         *    - Guild system
-         *    - Trading between players
-         *    - Daily challenges
-         *    - Seasonal events
-         * 
-         * 7. VISUAL ENHANCEMENTS:
-         *    - Particle effects for abilities
-         *    - Animated sprite sheets
-         *    - Dynamic backgrounds per floor
-         *    - Cutscenes for story progression
-         * 
-         * 8. AUDIO:
-         *    - Battle music (use Web Audio API or Howler.js)
-         *    - Sound effects for attacks/abilities
-         *    - Ambient floor sounds
-         *    - Victory/defeat themes
-         * 
-         * 9. ADDITIONAL SYSTEMS:
-         *    - Crafting system for items
-         *    - Quests and storylines
-         *    - NPC merchants and trainers
-         *    - Talent specializations
-         *    - Rune system for equipment
-         * 
-         * 10. QOL IMPROVEMENTS:
-         *     - Keybind customization
-         *     - Mobile touch controls
-         *     - Settings menu (volume, graphics)
-         *     - Tutorial system for new players
-         *     - Statistics tracking page
-         */
-        
-        // ============================================
-        // HELPER FUNCTIONS FOR FUTURE FEATURES
-        // ============================================
-        
-        // Placeholder for leaderboard integration
-        function submitScore(score) {
-            // Implementation with backend/Firebase
-            console.log('Score submission:', score);
-        }
-        
-        // Placeholder for multiplayer
-        function connectToServer() {
-            // WebSocket connection
-            console.log('Connecting to multiplayer server...');
-        }
-        
-        // Placeholder for boss generation
-        function generateBoss(floor) {
-            // Special boss enemy with unique abilities
-            return {
-                name: 'Tower Guardian',
-                isBoss: true,
-                phases: 3,
-                specialAbilities: []
-            };
-        }
-        
-        // Placeholder for crafting system
-        function craftItem(materials) {
-            // Combine materials to create new items
-            console.log('Crafting with materials:', materials);
-        }
-        
-        // Placeholder for skill tree
-        function unlockSkill(skillId) {
-            // Add skill to player's skill tree
-            console.log('Unlocking skill:', skillId);
-        }
+        Game.prototype.updateUI = function() {
+            if (!this.player) return;
+            
+            document.getElementById('className').textContent = this.player.name;
+            document.getElementById('charLevel').textContent = this.player.level;
+            document.getElementById('talentPoints').textContent = this.talentPoints;
+            document.getElementById('charHP').textContent = this.player.hp + '/' + this.player.maxHp;
+            document.getElementById('charXP').textContent = this.player.xp + '/' + this.player.xpToLevel;
+            document.getElementById('charAttack').textContent = this.player.attack;
+            document.getElementById('charDefense').textContent = this.player.defense;
+            document.getElementById('charGold').textContent = '💰 ' + this.player.gold;
+            
+            var hpPercent = (this.player.hp / this.player.maxHp) * 100;
+            document.getElementById('hpBar').style.width = hpPercent + '%';
+            
+            var xpPercent = (this.player.xp / this.player.xpToLevel) * 100;
+            document.getElementById('xpBar').style.width = xpPercent + '%';
+            
+            document.getElementById('floorNumber').textContent = this.floor;
+            document.getElementById('playerSprite').textContent = this.player.icon;
+            
+            if (this.activePet) {
+                document.getElementById('petSprite').textContent = this.activePet.icon;
+                document.getElementById('activePet').innerHTML = 
+                    '<div style="font-size: 2em; margin-bottom: 10px;">' + this.activePet.icon + '</div>' +
+                    '<div style="font-weight: bold; color: #ffd700;">' + this.activePet.name + '</div>' +
+                    '<div style="font-size: 0.9em; color: #aaa; margin-top: 5px;">' + this.activePet.desc + '</div>';
+            } else {
+                document.getElementById('petSprite').textContent = '';
+                document.getElementById('activePet').innerHTML = '<div style="color: #aaa;">No pet active</div>';
+            }
+            
+            if (this.enemy) {
+                document.getElementById('enemySprite').textContent = this.enemy.icon;
+                document.getElementById('enemyName').textContent = this.enemy.name;
+                document.getElementById('enemyHP').textContent = 'HP: ' + Math.max(0, this.enemy.hp) + '/' + this.enemy.maxHp;
+            }
+            
+            this.updateInventoryUI();
+        };
+
+        Game.prototype.updateInventoryUI = function() {
+            var invGrid = document.getElementById('inventoryGrid');
+            invGrid.innerHTML = '';
+            
+            for (var i = 0; i < this.player.inventory.length; i++) {
+                var item = this.player.inventory[i];
+                var itemDiv = document.createElement('div');
+                itemDiv.className = 'item-slot';
+                itemDiv.innerHTML = '<div class="rarity-' + item.rarity + '" style="font-weight: bold;">' + item.name + '</div>' +
+                    '<div style="font-size: 0.85em; color: #aaa;">' +
+                    (item.attack ? 'ATK: +' + item.attack + '<br>' : '') +
+                    (item.defense ? 'DEF: +' + item.defense + '<br>' : '') +
+                    (item.hp ? 'HP: +' + item.hp + '<br>' : '') +
+                    item.rarity.toUpperCase() + '</div>' +
+                    '<button class="btn" style="padding: 5px; font-size: 0.8em; width: 100%; margin-top: 5px;" onclick="game.equipItem(' + i + ')">Equip</button>';
+                invGrid.appendChild(itemDiv);
+            }
+            
+            if (this.player.inventory.length === 0) {
+                invGrid.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px;">Empty</div>';
+            }
+        };
+
+        Game.prototype.log = function(message) {
+            var log = document.getElementById('eventLog');
+            var entry = document.createElement('div');
+            entry.textContent = '> ' + message;
+            entry.style.borderBottom = '1px solid #1a1a2e';
+            entry.style.padding = '5px 0';
+            log.insertBefore(entry, log.firstChild);
+            while (log.children.length > 10) {
+                log.removeChild(log.lastChild);
+            }
+        };
+
+        var game = new Game();
+        window.onload = function() {
+            game.init();
+        };
     </script>
 </body>
-</html>(achievement => {
-                    if (this.unlockedAchievements.includes(achievement.id)) return;
-                    
-                    let unlocked = false;
-                    
-                    switch (achievement.condition) {
-                        case 'kills':
-                            if (this.statistics.kills >= achievement.value) unlocked = true;
-                            break;
-                        case 'floor':
-                            if (this.floor >= achievement.value) unlocked = true;
-                            break;
-                        case 'level':
-                            if (this.player.level >= achievement.value) unlocked = true;
-                            break;
-                        case 'gold':
-                            if (this.player.gold >= achievement.value) unlocked = true;
-                            break;
-                        case 'legendary':
-                            const hasLegendary = this.player.inventory.some(item => item.rarity === 'legendary');
-                            if (hasLegendary) unlocked = true;
-                            break;
-                        case 'prestige':
-                            if (this.prestigeLevel >= achievement.value) unlocked = true;
-                            break;
-                    }
-                    
-                    if (unlocked) {
-                        this.unlockAchievement(achievement);
-                    }
-                });
-            }
-
-            unlockAchievement(achievement) {
-                this.unlockedAchievements.push(achievement.id);
-                
-                // Show notification
-                const notification = document.getElementById('achievementNotification');
-                const text = document.getElementById('achievementText');
-                text.innerHTML = `<strong>${achievement.name}</strong><br>${achievement.description}`;
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-                
-                this.logEvent(`🏆 Achievement Unlocked: ${achievement.name}!`, 'event');
-            }
-
-            showAchievements() {
-                const modal = document.getElementById('achievementModal');
-                const list = document.getElementById('achievementList');
-                list.innerHTML = '';
-                
-                ACHIEVEMENTS.forEach
+</html>
